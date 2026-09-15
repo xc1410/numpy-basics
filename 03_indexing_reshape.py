@@ -3,6 +3,10 @@
 # 坑：第一版漏了 .sum()，只做了平方没求和，量出 53.1 倍是虚高的。
 #     报错在最后那行数值 assert 才暴露：ValueError: truth value of an array is ambiguous
 #     ⇒ 一个数组被当成条件判真假，说明它本该是标量却不是
+# 向量化 vs for 循环：一百万个元素求平方和
+# 三次倍数：56.6 / 62.7 / 65.2，波动约 ±7%（自己机器；LeetCode 判题机是 ±35%）
+# for 循环侧 0.1606/0.1605 几乎不动，波动全在向量化那 2.5 ms 上
+#   ⇒ 测量越短的东西，相对误差越大
 import numpy as np
 matrix = np.arange(12).reshape(3,4)
 assert matrix.shape == ( 3, 4),matrix.shape
@@ -52,7 +56,16 @@ print(f"向量化   {vec_time:.4f} 秒")
 print(f"快了 {loop_time / vec_time:.1f} 倍")
 
 assert abs(total_loop - total_vec)<1e-6,(total_loop,total_vec)
-
+# 4 广播
+# 规则：两个 shape 右端对齐，左边不够的前面补 1，然后从右往左逐维比较
+#   相等 → 用它 ｜ 有一个是 1 → 拉伸 ｜ 都不是 → 报错
+#
+# 组 1 (3,4)+(4,)  → (3,4)   4 对 4，3 对补出来的 1
+# 组 3 (3,4)+(3,)  → 报错    (3,) 的 3 被对到最后一维去和 4 比，不是和第一维的 3 比
+#      ⚠️ 我在这组判断错了：广播不找"哪里有相同的数字"，只从右往左硬对
+# 组 4 (32,1)+(1,32) → (32,32)  两边各拉伸一次，不报错
+#      ⚠️ 本想要 32 个数，拿到 1024 个。程序照跑、loss 照降、零报错
+#      ⇒ 这就是 4.7 强制写 assert shape 的理由
 # 4 广播
 # 组 1
 zeros_3x4 = np.zeros((3, 4))
