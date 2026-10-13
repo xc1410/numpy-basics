@@ -15,3 +15,14 @@ print(longest_consecutive([100, 4, 200, 1, 3, 2]))              # 期望 4
 print(longest_consecutive([0, 3, 7, 2, 5, 8, 4, 6, 0, 1]))      # 期望 9   ← 含重复的 0，证伪数据
 print(longest_consecutive([]))                                   # 期望 0   ← 边界，longest 初值写 1 就挂
 print(longest_consecutive([1, 0, 1, 2]))                         # 期望 3   ← 重复 + 不连续起点
+import numpy as np
+scores=np.random.randn(32,128)
+row_sum=scores.sum(axis=1,keepdims=1)
+assert row_sum.shape==(32,1),row_sum.shape
+probs=scores/row_sum
+assert probs.shape==(32,128),probs.shape
+# x (32,784) @ w1 (784,128) → ?(32,128)
+#   + b1 (128,) 广播        → ?(32,128)
+#   relu                     → ?(32,128)
+#   @ w2 (128,10)            → ?(32,10)
+#   沿 axis=1 归一化          → ?(32,10)
