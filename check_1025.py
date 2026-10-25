@@ -13,7 +13,7 @@ print(two_sum([3, 3], 6))           # 期望 [0, 1]  ← 重复元素
 import numpy as np
 scores=np.random.randn(32,128)
 row_sum=scores.sum(axis=1,keepdims=True)
-assert row_sum.shape==(32,2),row_sum.shape
+assert row_sum.shape==(32,1),row_sum.shape
 result =scores/row_sum
 assert result.shape==(32,128),result.shape
 # import numpy as np
